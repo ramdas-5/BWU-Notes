@@ -1,0 +1,2048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBMS Complete Guide — From Child to Professor</title>
+    <style>
+        :root {
+            --bg: #08080f;
+            --bg2: #0d0d1a;
+            --surface: #12122a;
+            --surface2: #1a1a3a;
+            --surface3: #22224a;
+            --border: #2a2a5a;
+            --border-light: #3a3a6a;
+            --text: #e8e8f0;
+            --text-dim: #a0a0c0;
+            --text-muted: #606080;
+            --accent1: #6c5ce7;
+            --accent2: #00cec9;
+            --accent3: #fd79a8;
+            --accent4: #fdcb6e;
+            --accent5: #55efc4;
+            --accent6: #e17055;
+            --accent7: #74b9ff;
+            --grad1: linear-gradient(135deg, #6c5ce7, #00cec9);
+            --grad2: linear-gradient(135deg, #fd79a8, #6c5ce7);
+            --grad3: linear-gradient(135deg, #fdcb6e, #e17055);
+            --grad4: linear-gradient(135deg, #55efc4, #00cec9);
+            --grad5: linear-gradient(135deg, #74b9ff, #6c5ce7);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 16px 64px rgba(0, 0, 0, 0.6);
+            --radius: 16px;
+            --radius-sm: 8px;
+            --radius-lg: 24px;
+            --sidebar-w: 280px;
+            --font: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --mono: 'Cascadia Code', 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-light);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent1);
+        }
+
+        /* Progress Bar */
+        #progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: var(--grad1);
+            width: 0%;
+            z-index: 10000;
+            transition: width 0.1s ease-out;
+            border-radius: 0 2px 2px 0;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            background: var(--bg2);
+            border-right: 1px solid var(--border);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--border);
+        }
+
+        .sidebar-header {
+            padding: 20px 16px 12px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .sidebar-header h2 {
+            font-size: 16px;
+            font-weight: 700;
+            background: var(--grad1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sidebar-header p {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            letter-spacing: 0.5px;
+        }
+        .search-box {
+            margin: 12px 16px;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px 36px 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-box input:focus {
+            border-color: var(--accent1);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+        }
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+        .search-box span {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 8px 0;
+            flex: 1;
+        }
+        .nav-list li a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .nav-list li a:hover {
+            color: var(--text);
+            background: var(--surface);
+            border-left-color: var(--accent1);
+        }
+        .nav-list li a.active {
+            color: var(--text);
+            background: var(--surface);
+            border-left-color: var(--accent2);
+        }
+        .nav-list li a .icon {
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .nav-list li a .label {
+            flex: 1;
+        }
+        .nav-list li a .badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            background: var(--surface3);
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .nav-group-title {
+            padding: 12px 16px 4px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        /* Main Content */
+        .main {
+            margin-left: var(--sidebar-w);
+            padding: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(108, 92, 231, 0.25) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(0, 206, 201, 0.2) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(253, 121, 168, 0.15) 0%, transparent 50%),
+                var(--bg);
+            text-align: center;
+            padding: 40px;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236c5ce7' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+        }
+        .hero-badge {
+            display: inline-block;
+            padding: 6px 20px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: var(--surface2);
+            border: 1px solid var(--border-light);
+            color: var(--accent2);
+            margin-bottom: 24px;
+            animation: fadeInUp 0.8s ease;
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 7vw, 5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+            background: var(--grad1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 0.8s ease 0.1s both;
+        }
+        .hero p {
+            font-size: 18px;
+            color: var(--text-dim);
+            margin-bottom: 32px;
+            animation: fadeInUp 0.8s ease 0.2s both;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .hero-meta {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease 0.3s both;
+        }
+        .hero-meta .chip {
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 500;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .hero-meta .chip span {
+            font-size: 16px;
+        }
+
+        /* Content Sections */
+        .section {
+            padding: 60px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .section-header {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        .section-header h2 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: var(--grad1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        .section-header p {
+            color: var(--text-dim);
+            font-size: 16px;
+        }
+        .section-divider {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 60px auto;
+            max-width: 600px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .card:hover {
+            border-color: var(--border-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--grad1);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .card:hover::before {
+            opacity: 1;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-title .emoji {
+            font-size: 22px;
+        }
+        .card-subtitle {
+            font-size: 14px;
+            color: var(--accent2);
+            font-weight: 600;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+        .card p,
+        .card li {
+            color: var(--text-dim);
+            font-size: 14px;
+        }
+        .card ul {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+        .card li {
+            margin-bottom: 4px;
+        }
+
+        /* Grid layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        .grid-5 {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+        }
+
+        /* Tables */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        table th {
+            background: var(--surface3);
+            color: var(--text);
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        table td {
+            padding: 10px 12px;
+            border-top: 1px solid var(--border);
+            color: var(--text-dim);
+            vertical-align: top;
+        }
+        table tr:hover td {
+            background: var(--surface2);
+            color: var(--text);
+        }
+        table .highlight {
+            color: var(--accent2);
+            font-weight: 600;
+        }
+        table .danger {
+            color: var(--accent6);
+            font-weight: 600;
+        }
+        table .success {
+            color: var(--accent5);
+            font-weight: 600;
+        }
+
+        /* Code blocks */
+        .code-block {
+            background: #0a0a1a;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin: 12px 0;
+            font-family: var(--mono);
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-x: auto;
+            position: relative;
+        }
+        .code-block::before {
+            content: 'SQL';
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            font-family: var(--font);
+        }
+        .code-block .kw {
+            color: var(--accent3);
+            font-weight: 600;
+        }
+        .code-block .fn {
+            color: var(--accent2);
+        }
+        .code-block .str {
+            color: var(--accent4);
+        }
+        .code-block .num {
+            color: var(--accent7);
+        }
+        .code-block .cmt {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        .code-block .op {
+            color: var(--text);
+        }
+
+        /* Visual diagrams */
+        .diagram {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+            margin: 16px 0;
+            padding: 20px;
+            background: var(--bg2);
+            border-radius: var(--radius-sm);
+            border: 1px dashed var(--border);
+            min-height: 80px;
+        }
+        .diagram .box {
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            border: 2px solid;
+            transition: transform 0.2s;
+        }
+        .diagram .box:hover {
+            transform: scale(1.05);
+        }
+        .diagram .arrow {
+            font-size: 20px;
+            color: var(--text-muted);
+        }
+        .diagram .arrow-down {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 20px;
+            color: var(--text-muted);
+        }
+        .diagram-vertical {
+            flex-direction: column;
+            align-items: center;
+        }
+        .box-accent1 {
+            border-color: var(--accent1);
+            background: rgba(108, 92, 231, 0.15);
+            color: var(--accent1);
+        }
+        .box-accent2 {
+            border-color: var(--accent2);
+            background: rgba(0, 206, 201, 0.15);
+            color: var(--accent2);
+        }
+        .box-accent3 {
+            border-color: var(--accent3);
+            background: rgba(253, 121, 168, 0.15);
+            color: var(--accent3);
+        }
+        .box-accent4 {
+            border-color: var(--accent4);
+            background: rgba(253, 203, 110, 0.15);
+            color: var(--accent4);
+        }
+        .box-accent5 {
+            border-color: var(--accent5);
+            background: rgba(85, 239, 196, 0.15);
+            color: var(--accent5);
+        }
+        .box-accent6 {
+            border-color: var(--accent6);
+            background: rgba(225, 112, 85, 0.15);
+            color: var(--accent6);
+        }
+        .box-accent7 {
+            border-color: var(--accent7);
+            background: rgba(116, 185, 255, 0.15);
+            color: var(--accent7);
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .badge-blue {
+            background: rgba(108, 92, 231, 0.2);
+            color: var(--accent1);
+        }
+        .badge-teal {
+            background: rgba(0, 206, 201, 0.2);
+            color: var(--accent2);
+        }
+        .badge-pink {
+            background: rgba(253, 121, 168, 0.2);
+            color: var(--accent3);
+        }
+        .badge-yellow {
+            background: rgba(253, 203, 110, 0.2);
+            color: var(--accent4);
+        }
+        .badge-green {
+            background: rgba(85, 239, 196, 0.2);
+            color: var(--accent5);
+        }
+        .badge-orange {
+            background: rgba(225, 112, 85, 0.2);
+            color: var(--accent6);
+        }
+
+        /* Callout */
+        .callout {
+            padding: 16px 20px;
+            border-radius: var(--radius-sm);
+            margin: 16px 0;
+            font-size: 14px;
+            border-left: 4px solid;
+        }
+        .callout-info {
+            background: rgba(0, 206, 201, 0.1);
+            border-color: var(--accent2);
+            color: var(--accent2);
+        }
+        .callout-warn {
+            background: rgba(253, 203, 110, 0.1);
+            border-color: var(--accent4);
+            color: var(--accent4);
+        }
+        .callout-danger {
+            background: rgba(225, 112, 85, 0.1);
+            border-color: var(--accent6);
+            color: var(--accent6);
+        }
+        .callout-success {
+            background: rgba(85, 239, 196, 0.1);
+            border-color: var(--accent5);
+            color: var(--accent5);
+        }
+
+        /* Comparison card */
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 16px 0;
+        }
+        .compare-item {
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+        .compare-item.pros {
+            background: rgba(85, 239, 196, 0.05);
+            border-color: rgba(85, 239, 196, 0.3);
+        }
+        .compare-item.cons {
+            background: rgba(225, 112, 85, 0.05);
+            border-color: rgba(225, 112, 85, 0.3);
+        }
+        .compare-item h4 {
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        .fade-in {
+            animation: fadeInUp 0.6s ease both;
+        }
+        .fade-in-1 {
+            animation-delay: 0.1s;
+        }
+        .fade-in-2 {
+            animation-delay: 0.2s;
+        }
+        .fade-in-3 {
+            animation-delay: 0.3s;
+        }
+
+        /* Module tag colors */
+        .module-tag {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .module-m1 {
+            background: rgba(108, 92, 231, 0.2);
+            color: #a29bfe;
+        }
+        .module-m2 {
+            background: rgba(0, 206, 201, 0.2);
+            color: #81ecec;
+        }
+        .module-m3 {
+            background: rgba(253, 121, 168, 0.2);
+            color: #fab1a0;
+        }
+        .module-m4 {
+            background: rgba(253, 203, 110, 0.2);
+            color: #fdcb6e;
+        }
+        .module-m5 {
+            background: rgba(85, 239, 196, 0.2);
+            color: #55efc4;
+        }
+        .module-tutorial {
+            background: rgba(116, 185, 255, 0.2);
+            color: #74b9ff;
+        }
+
+        /* Sub-section */
+        .sub-section {
+            margin: 40px 0 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+        .sub-section h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text);
+            letter-spacing: -0.5px;
+        }
+        .sub-section h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 16px 0 8px;
+            color: var(--text);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            padding: 20px 40px;
+            text-align: center;
+            margin-top: auto;
+            width: 100%;
+        }
+        .footer p {
+            color: var(--text-dim);
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+        .footer a {
+            color: var(--accent2);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .footer a:hover {
+            color: var(--accent1);
+        }
+        .footer .dev-credit {
+            background: var(--grad1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        /* Responsive */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 10001;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        @media (max-width: 1024px) {
+            .grid-3,
+            .grid-4,
+            .grid-5 {
+                grid-template-columns: 1fr 1fr;
+            }
+            .section {
+                padding: 40px 20px;
+            }
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 260px;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .mobile-toggle {
+                display: block;
+            }
+            .main {
+                margin-left: 0;
+            }
+            .grid-2,
+            .grid-3,
+            .grid-4,
+            .grid-5,
+            .compare-grid {
+                grid-template-columns: 1fr;
+            }
+            .section {
+                padding: 30px 16px;
+            }
+            .hero {
+                padding: 24px;
+                min-height: 80vh;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .diagram {
+                padding: 12px;
+                gap: 8px;
+            }
+            .diagram .box {
+                padding: 8px 12px;
+                font-size: 11px;
+            }
+            .footer {
+                padding: 16px 20px;
+            }
+        }
+
+        /* Print-friendly */
+        @media print {
+            .sidebar,
+            .mobile-toggle,
+            #progress-bar {
+                display: none !important;
+            }
+            .main {
+                margin-left: 0;
+            }
+            .hero {
+                min-height: auto;
+                padding: 40px;
+            }
+            .card {
+                break-inside: avoid;
+            }
+            body {
+                background: #fff;
+                color: #333;
+            }
+            .code-block {
+                background: #f5f5f5;
+                border-color: #ddd;
+            }
+            .footer {
+                background: #f5f5f5;
+                color: #333;
+                border-color: #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Progress Bar -->
+    <div id="progress-bar"></div>
+
+    <!-- Mobile Toggle -->
+    <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle navigation">☰</button>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>📚 DBMS Guide</h2>
+            <p>Child → Professor · Complete</p>
+        </div>
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Search topics..." oninput="filterNav(this.value)">
+            <span>🔍</span>
+        </div>
+        <ul class="nav-list" id="nav-list">
+            <li><a href="#home" class="active"><span class="icon">🏠</span><span class="label">Home</span><span class="badge">Start</span></a></li>
+            <li class="nav-group-title">Module 1 — Foundations</li>
+            <li><a href="#m1-1"><span class="icon">🗄️</span><span class="label">1.1 Database & DBMS</span></a></li>
+            <li><a href="#m1-2"><span class="icon">🔍</span><span class="label">1.2 Data Abstraction</span></a></li>
+            <li><a href="#m1-3"><span class="icon">💬</span><span class="label">1.3 SQL Sublanguages</span></a></li>
+            <li><a href="#m1-4"><span class="icon">📐</span><span class="label">1.4 Data Models</span></a></li>
+            <li><a href="#m1-5"><span class="icon">🔒</span><span class="label">1.5 Integrity Constraints</span></a></li>
+            <li><a href="#m1-6"><span class="icon">✏️</span><span class="label">1.6 Data Operations</span></a></li>
+            <li class="nav-group-title">Module 2 — Querying & Design</li>
+            <li><a href="#m2-1"><span class="icon">Σ</span><span class="label">2.1 Relational Algebra</span></a></li>
+            <li><a href="#m2-2"><span class="icon">🔗</span><span class="label">2.2 Joins</span></a></li>
+            <li><a href="#m2-3"><span class="icon">📊</span><span class="label">2.3 Relational Calculus</span></a></li>
+            <li><a href="#m2-4"><span class="icon">💾</span><span class="label">2.4 SQL in Practice</span></a></li>
+            <li><a href="#m2-5"><span class="icon">📋</span><span class="label">2.5 Normalization</span></a></li>
+            <li><a href="#m2-6"><span class="icon">🔑</span><span class="label">2.6 Functional Dependencies</span></a></li>
+            <li><a href="#m2-7"><span class="icon">⚡</span><span class="label">2.7 Query Optimization</span></a></li>
+            <li><a href="#m2-8"><span class="icon">⚖️</span><span class="label">2.8 MySQL vs Oracle</span></a></li>
+            <li class="nav-group-title">Module 3 — Internals</li>
+            <li><a href="#m3-1"><span class="icon">📇</span><span class="label">3.1 Indexing</span></a></li>
+            <li><a href="#m3-2"><span class="icon">🌳</span><span class="label">3.2 B-Trees & B+ Trees</span></a></li>
+            <li><a href="#m3-3"><span class="icon">#️⃣</span><span class="label">3.3 Hashing</span></a></li>
+            <li><a href="#m3-4"><span class="icon">🔄</span><span class="label">3.4 Transactions & ACID</span></a></li>
+            <li><a href="#m3-5"><span class="icon">🔐</span><span class="label">3.5 Concurrency Control</span></a></li>
+            <li><a href="#m3-6"><span class="icon">🛡️</span><span class="label">3.6 Recovery</span></a></li>
+            <li class="nav-group-title">Module 4 — Security</li>
+            <li><a href="#m4-1"><span class="icon">🛡️</span><span class="label">4.1 Why Security Matters</span></a></li>
+            <li><a href="#m4-2"><span class="icon">👤</span><span class="label">4.2 Authentication</span></a></li>
+            <li><a href="#m4-3"><span class="icon">✅</span><span class="label">4.3 Authorization</span></a></li>
+            <li><a href="#m4-4"><span class="icon">🏛️</span><span class="label">4.4 Access Control Models</span></a></li>
+            <li><a href="#m4-5"><span class="icon">🔐</span><span class="label">4.5 Encryption</span></a></li>
+            <li><a href="#m4-6"><span class="icon">💥</span><span class="label">4.6 Real Breaches</span></a></li>
+            <li class="nav-group-title">Module 5 — Analytics</li>
+            <li><a href="#m5-1"><span class="icon">🏗️</span><span class="label">5.1 Data Warehousing</span></a></li>
+            <li><a href="#m5-2"><span class="icon">⛏️</span><span class="label">5.2 Data Mining</span></a></li>
+            <li><a href="#m5-3"><span class="icon">🔒</span><span class="label">5.3 DW Security</span></a></li>
+            <li class="nav-group-title">Tutorials</li>
+            <li><a href="#t01"><span class="icon">📝</span><span class="label">T01-T05</span></a></li>
+            <li><a href="#t06"><span class="icon">📝</span><span class="label">T06-T10</span></a></li>
+            <li><a href="#t11"><span class="icon">📝</span><span class="label">T11-T15</span></a></li>
+            <li class="nav-group-title">Reference</li>
+            <li><a href="#sql-commands"><span class="icon">📖</span><span class="label">SQL Command Summary</span></a></li>
+            <li><a href="#practice"><span class="icon">🎯</span><span class="label">Practice Questions</span></a></li>
+            <li><a href="#final-word"><span class="icon">🎓</span><span class="label">Final Word</span></a></li>
+        </ul>
+    </nav>
+
+    <!-- Overlay for mobile -->
+    <div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none;" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="main">
+
+        <!-- HERO -->
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <div class="hero-badge">📊 Complete DBMS Course</div>
+                <h1>Database<br>Management Systems</h1>
+                <p>From child to professor — Module by module, point by point. Every concept explained with visualizations, examples, and real-world insight.</p>
+                <div class="hero-meta">
+                    <span class="chip"><span>📦</span> 5 Modules</span>
+                    <span class="chip"><span>📝</span> 15 Tutorials</span>
+                    <span class="chip"><span>🎯</span> 5 Practice Sets</span>
+                    <span class="chip"><span>💡</span> 100+ Visuals</span>
+                    <span class="chip"><span>🔒</span> CIA Triad</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- MODULE 1 -->
+        <!-- ============================================ -->
+        <section class="section" id="m1-1">
+            <div class="section-header">
+                <span class="module-tag module-m1">Module 1</span>
+                <h2>Foundations of Database Management Systems</h2>
+                <p>The problem before databases · What is a DBMS · Abstraction · Data models · Constraints</p>
+            </div>
+
+            <!-- 1.1 -->
+            <div class="sub-section" id="m1-1a">
+                <h3>1.1 What is a Database and Why Do We Need It?</h3>
+                <div class="callout callout-warn">
+                    <strong>The Problem:</strong> Imagine running a university with 10,000 students, 500 courses, 50 instructors. Without a database, data lives in text files — students.txt, courses.txt, enrollment.txt. If "John Smith" changes his name, you must update <em>three files manually</em>. Miss one → <strong>data inconsistency</strong>.
+                </div>
+                <div class="grid-2">
+                    <div class="card fade-in">
+                        <div class="card-title"><span class="emoji">📁</span> File System Problems</div>
+                        <ul>
+                            <li><strong>Redundancy</strong> — Same data stored multiple times</li>
+                            <li><strong>Inconsistency</strong> — Different versions of same data</li>
+                            <li><strong>Poor Security</strong> — No central control</li>
+                            <li><strong>Concurrency Issues</strong> — Hard to handle multiple users</li>
+                            <li><strong>Retrieval Difficulty</strong> — Data scattered everywhere</li>
+                        </ul>
+                    </div>
+                    <div class="card fade-in fade-in-1">
+                        <div class="card-title"><span class="emoji">🗄️</span> DBMS Solution</div>
+                        <ul>
+                            <li>Data stored <strong>once</strong>, referenced everywhere</li>
+                            <li>One update → consistent everywhere</li>
+                            <li>Many users access simultaneously</li>
+                            <li>All data organized in one place</li>
+                            <li>Fine-grained access control</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card fade-in fade-in-2">
+                    <div class="card-title"><span class="emoji">💡</span> Analogy</div>
+                    <p>If the database is a <strong>filing cabinet</strong>, the DBMS is the <strong>librarian</strong> — organizes everything, finds anything, controls access, never loses data.</p>
+                </div>
+                <h4>Comparison: File System vs DBMS</h4>
+                <div class="table-wrap">
+                    <table>
+                        <tr><th>Problem in Files</th><th>Solution in DBMS</th></tr>
+                        <tr><td>Same data in multiple files</td><td>Stored once, referenced everywhere</td></tr>
+                        <tr><td>Updates break consistency</td><td>One update, consistent everywhere</td></tr>
+                        <tr><td>Only one person at a time</td><td>Many users can access simultaneously</td></tr>
+                        <tr><td>Data scattered</td><td>All data in one organized place</td></tr>
+                        <tr><td>Hard to secure</td><td>Fine-grained access control</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 1.2 -->
+            <div class="sub-section" id="m1-2">
+                <h3>1.2 Data Abstraction — Hiding Complexity</h3>
+                <p>Like driving a car without knowing how the engine works. Databases hide internal complexity behind simple interfaces.</p>
+                <div class="diagram diagram-vertical">
+                    <div class="box box-accent1" style="min-width:200px;">🔍 VIEW LEVEL (Top Floor)<br><small>What users see — "Show me my grades"</small></div>
+                    <div class="arrow-down">▼</div>
+                    <div class="box box-accent2" style="min-width:200px;">🧠 CONCEPTUAL LEVEL (Middle)<br><small>What data exists — "Students take Courses"</small></div>
+                    <div class="arrow-down">▼</div>
+                    <div class="box box-accent3" style="min-width:200px;">💾 PHYSICAL LEVEL (Ground)<br><small>How data is stored — "Files on disk, B-tree indexes"</small></div>
+                </div>
+                <div class="grid-3">
+                    <div class="card fade-in"><div class="card-subtitle">Level 1</div><div class="card-title">💾 Physical</div><p>How data is stored on disk. Who cares: DBAs. Example: Records stored on blocks 100–150.</p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-subtitle">Level 2</div><div class="card-title">🧠 Conceptual</div><p>What data exists and relationships. Who cares: Designers. Example: Students have IDs, names, departments.</p></div>
+                    <div class="card fade-in fade-in-2"><div class="card-subtitle">Level 3</div><div class="card-title">🔍 View</div><p>What each user sees. Who cares: End users. Example: Registrar sees grades; HR sees department only.</p></div>
+                </div>
+                <h4>Data Independence</h4>
+                <div class="grid-2">
+                    <div class="card fade-in"><div class="card-title">🔧 Physical Independence</div><p>Change storage without affecting users. Example: Add an index to speed up search — users don't notice.</p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">📊 Logical Independence</div><p>Change data structure without breaking views. Example: Add an "email" column; adjust views as needed.</p></div>
+                </div>
+            </div>
+
+            <!-- 1.3 -->
+            <div class="sub-section" id="m1-3">
+                <h3>1.3 SQL Sublanguages: DDL and DML</h3>
+                <div class="diagram">
+                    <div class="box box-accent1">DDL (Structure)<br><small>CREATE · ALTER · DROP · TRUNCATE</small><br><em>Auto-commits — can't undo</em></div>
+                    <div class="arrow">⇄</div>
+                    <div class="box box-accent2">DML (Data)<br><small>SELECT · INSERT · UPDATE · DELETE</small><br><em>Needs commit — can roll back</em></div>
+                </div>
+                <div class="grid-2">
+                    <div class="card fade-in"><div class="card-title">🏗️ DDL — Data Definition</div><p>Design and modify structure — like a house blueprint.</p><ul><li><code>CREATE</code> — Build new tables</li><li><code>ALTER</code> — Modify existing tables</li><li><code>DROP</code> — Remove tables</li><li><code>TRUNCATE</code> — Empty table, keep structure</li></ul></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">🪑 DML — Data Manipulation</div><p>Work with actual data — like furnishing the house.</p><ul><li><code>SELECT</code> — Read/view data</li><li><code>INSERT</code> — Add new data</li><li><code>UPDATE</code> — Change existing data</li><li><code>DELETE</code> — Remove data</li></ul></div>
+                </div>
+            </div>
+
+            <!-- 1.4 -->
+            <div class="sub-section" id="m1-4">
+                <h3>1.4 Data Models — Blueprint for Databases</h3>
+                <div class="diagram">
+                    <div class="box box-accent1">📐 Conceptual<br><small>ER Model</small></div>
+                    <div class="arrow">→</div>
+                    <div class="box box-accent2">📊 Logical<br><small>Relational · Network · Hierarchical · OO</small></div>
+                    <div class="arrow">→</div>
+                    <div class="box box-accent3">💾 Physical<br><small>Indexing · File Org · Partitioning</small></div>
+                </div>
+                <h4>Relational Model — Most Important</h4>
+                <div class="table-wrap">
+                    <table>
+                        <tr><th>student_id</th><th>name</th><th>dept_id</th><th>tot_cred</th></tr>
+                        <tr><td>CS2026001</td><td>Alice</td><td>CS</td><td>60</td></tr>
+                        <tr><td>CS2026002</td><td>Bob</td><td>CS</td><td>45</td></tr>
+                        <tr><td>EE2026003</td><td>Charlie</td><td>EE</td><td>50</td></tr>
+                    </table>
+                </div>
+                <p><strong>Key Terms:</strong> Relation = Table · Tuple = Row · Attribute = Column · Domain = Allowed values · Degree = #columns · Cardinality = #rows</p>
+
+                <h4>ER Model — Building Blocks</h4>
+                <div class="diagram">
+                    <div class="box box-accent1">⬛ Entity<br><small>Rectangle</small></div>
+                    <div class="box box-accent2">⭕ Attribute<br><small>Oval</small></div>
+                    <div class="box box-accent3">🔶 Relationship<br><small>Diamond</small></div>
+                </div>
+                <div class="diagram">
+                    <span class="box box-accent1">Student</span>
+                    <span class="arrow">──(Takes)──</span>
+                    <span class="box box-accent2">Course</span>
+                </div>
+
+                <h4>Hierarchical Model (Tree Structure)</h4>
+                <div class="diagram">
+                    <span class="box box-accent1">Department</span>
+                    <span class="arrow">→</span>
+                    <span class="box box-accent2">Course</span>
+                    <span class="box box-accent2">Instructor</span>
+                </div>
+                <p class="text-muted" style="color:var(--text-muted);font-size:13px;">Each child has exactly one parent. Problem: can't represent "student in multiple departments."</p>
+
+                <h4>Network Model (Graph Structure)</h4>
+                <p class="text-muted" style="color:var(--text-muted);font-size:13px;">Children can have multiple parents — complex, hard to understand.</p>
+
+                <h4>Object-Oriented Model</h4>
+                <div class="card fade-in">
+                    <p>Combines DB with OOP: objects have data + behavior, inheritance (Student IS-A Person), complex data types.</p>
+                </div>
+            </div>
+
+            <!-- 1.5 -->
+            <div class="sub-section" id="m1-5">
+                <h3>1.5 Integrity Constraints — Keeping Data Clean</h3>
+                <div class="grid-5">
+                    <div class="card fade-in" style="text-align:center;"><div class="card-title">1️⃣ Domain</div><p style="font-size:12px;">Values from correct domain</p></div>
+                    <div class="card fade-in fade-in-1" style="text-align:center;"><div class="card-title">2️⃣ Key</div><p style="font-size:12px;">Values must be unique</p></div>
+                    <div class="card fade-in fade-in-2" style="text-align:center;"><div class="card-title">3️⃣ Entity</div><p style="font-size:12px;">PK cannot be NULL</p></div>
+                    <div class="card fade-in fade-in-3" style="text-align:center;"><div class="card-title">4️⃣ Referential</div><p style="font-size:12px;">FK must reference existing PK</p></div>
+                    <div class="card fade-in" style="text-align:center;"><div class="card-title">5️⃣ CHECK</div><p style="font-size:12px;">Custom validation logic</p></div>
+                </div>
+                <div class="callout callout-success">
+                    <strong>Referential Integrity Actions:</strong> RESTRICT (can't delete if referenced) · CASCADE (delete referenced too) · SET NULL · SET DEFAULT
+                </div>
+            </div>
+
+            <!-- 1.6 -->
+            <div class="sub-section" id="m1-6">
+                <h3>1.6 Data Manipulation Operations</h3>
+                <div class="grid-4">
+                    <div class="card fade-in" style="text-align:center;"><div class="card-title">📖 SELECT</div><p style="font-size:12px;">Read data</p></div>
+                    <div class="card fade-in fade-in-1" style="text-align:center;"><div class="card-title">➕ INSERT</div><p style="font-size:12px;">Create data</p></div>
+                    <div class="card fade-in fade-in-2" style="text-align:center;"><div class="card-title">✏️ UPDATE</div><p style="font-size:12px;">Modify data</p></div>
+                    <div class="card fade-in fade-in-3" style="text-align:center;"><div class="card-title">🗑️ DELETE</div><p style="font-size:12px;">Remove data</p></div>
+                </div>
+                <h4>Views — Virtual Tables</h4>
+                <div class="card fade-in"><p>A view is a saved SELECT statement that acts like a table. Used for security, simplicity, and consistency.</p></div>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <!-- ============================================ -->
+        <!-- MODULE 2 -->
+        <!-- ============================================ -->
+        <section class="section" id="m2-1">
+            <div class="section-header">
+                <span class="module-tag module-m2">Module 2</span>
+                <h2>Relational Algebra, SQL, Normalization, Optimization</h2>
+                <p>The math behind SQL · Joins · Calculus · Normalization · Query optimization</p>
+            </div>
+
+            <!-- 2.1 -->
+            <div class="sub-section" id="m2-1a">
+                <h3>2.1 Relational Algebra — The Math Behind SQL</h3>
+                <p>Operations that work on tables and produce new tables. Like a recipe book for data.</p>
+                <div class="grid-3">
+                    <div class="card fade-in"><div class="card-title">σ SELECT</div><p>Filter rows based on condition. Analogy: sieve.</p><p><code>σ(Dept='IT')(EMPLOYEE)</code></p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">π PROJECT</div><p>Choose specific columns. Removes duplicates.</p><p><code>π(Name, Salary)(EMPLOYEE)</code></p></div>
+                    <div class="card fade-in fade-in-2"><div class="card-title">ρ RENAME</div><p>Give new names to tables/columns.</p><p><code>ρ(Workers)(EMPLOYEE)</code></p></div>
+                </div>
+                <div class="grid-2">
+                    <div class="card fade-in"><div class="card-title">∪ UNION</div><p>Combine rows from two tables, removing duplicates.</p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">− SET DIFFERENCE</div><p>Rows in first table but not second.</p></div>
+                </div>
+            </div>
+
+            <!-- 2.2 -->
+            <div class="sub-section" id="m2-2">
+                <h3>2.2 Joins — Connecting Tables</h3>
+                <div class="grid-3">
+                    <div class="card fade-in"><div class="card-title">× Cartesian Product</div><p>Every row paired with every row. Problem: most combinations meaningless.</p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">⋈θ Theta Join</div><p>Cartesian + condition. Only meaningful rows.</p></div>
+                    <div class="card fade-in fade-in-2"><div class="card-title">⋈ Natural Join</div><p>Auto-join on same-named columns.</p></div>
+                </div>
+            </div>
+
+            <!-- 2.3 -->
+            <div class="sub-section" id="m2-3">
+                <h3>2.3 Relational Calculus — Declarative Querying</h3>
+                <p>Algebra says <strong>HOW</strong> to get data. Calculus says <strong>WHAT</strong> data you want.</p>
+                <div class="grid-2">
+                    <div class="card fade-in"><div class="card-title">Tuple Relational Calculus</div><p><code>{ t | CONDITION(t) }</code><br>"Set of all tuples t such that condition is true."</p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">Domain Relational Calculus</div><p>Variables represent individual values, not tuples.</p></div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <tr><th>Feature</th><th>Algebra</th><th>Calculus</th></tr>
+                        <tr><td>Style</td><td>Procedural</td><td>Declarative</td></tr>
+                        <tr><td>Focus</td><td>How to get data</td><td>What data to get</td></tr>
+                        <tr><td>Symbols</td><td>σ, π, ⋈, ×, ∪, −</td><td>{ t | CONDITION(t) }</td></tr>
+                        <tr><td>SQL Mapping</td><td>FROM/JOIN</td><td>WHERE</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2.4 -->
+            <div class="sub-section" id="m2-4">
+                <h3>2.4 SQL — The Practical Language</h3>
+                <div class="card fade-in">
+                    <div class="card-subtitle">SQL vs Relational Algebra</div>
+                    <div class="table-wrap">
+                        <table>
+                            <tr><th>SQL Clause</th><th>Relational Algebra</th></tr>
+                            <tr><td>SELECT columns</td><td>PROJECT (π)</td></tr>
+                            <tr><td>FROM tables</td><td>CARTESIAN PRODUCT</td></tr>
+                            <tr><td>WHERE condition</td><td>SELECT (σ)</td></tr>
+                            <tr><td>JOIN ... ON</td><td>THETA JOIN</td></tr>
+                            <tr><td>AS</td><td>RENAME (ρ)</td></tr>
+                            <tr><td>UNION</td><td>UNION</td></tr>
+                            <tr><td>EXCEPT</td><td>SET DIFFERENCE</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2.5 -->
+            <div class="sub-section" id="m2-5">
+                <h3>2.5 Normalization — Organizing Data Properly</h3>
+                <div class="callout callout-danger">
+                    <strong>Anomalies:</strong> Update (change 3 rows) · Insertion (can't add without order) · Deletion (deleting order loses customer)
+                </div>
+                <div class="diagram diagram-vertical">
+                    <div class="box box-accent1">0NF — Unnormalized</div>
+                    <div class="arrow-down">▼</div>
+                    <div class="box box-accent2">1NF — Remove repeating groups</div>
+                    <div class="arrow-down">▼</div>
+                    <div class="box box-accent3">2NF — Remove partial dependencies</div>
+                    <div class="arrow-down">▼</div>
+                    <div class="box box-accent4">3NF — Remove transitive dependencies</div>
+                    <div class="arrow-down">▼</div>
+                    <div class="box box-accent5">BCNF — All determinants are keys</div>
+                </div>
+                <div class="grid-3">
+                    <div class="card fade-in"><div class="card-title">1NF</div><p>Every cell has a single value. No lists or repeating groups.</p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">2NF</div><p>1NF + No partial dependencies. Non-key attributes depend on entire key.</p></div>
+                    <div class="card fade-in fade-in-2"><div class="card-title">3NF</div><p>2NF + No transitive dependencies. Non-key can't depend on another non-key.</p></div>
+                </div>
+            </div>
+
+            <!-- 2.6 -->
+            <div class="sub-section" id="m2-6">
+                <h3>2.6 Functional Dependencies</h3>
+                <p><strong>FD:</strong> If two rows have same X, they must have same Y. Notation: <code>X → Y</code></p>
+                <div class="grid-3">
+                    <div class="card fade-in"><div class="card-title">Reflexivity</div><p>If Y ⊆ X, then X → Y</p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">Augmentation</div><p>If X → Y, then XZ → YZ</p></div>
+                    <div class="card fade-in fade-in-2"><div class="card-title">Transitivity</div><p>If X → Y and Y → Z, then X → Z</p></div>
+                </div>
+                <p><strong>Candidate key:</strong> Minimal set of attributes that determines all others. Found via attribute closure.</p>
+            </div>
+
+            <!-- 2.7 -->
+            <div class="sub-section" id="m2-7">
+                <h3>2.7 Query Optimization — Making SQL Fast</h3>
+                <div class="diagram">
+                    <div class="box box-accent1">SQL Query</div>
+                    <div class="arrow">→</div>
+                    <div class="box box-accent2">Parser</div>
+                    <div class="arrow">→</div>
+                    <div class="box box-accent3">Rewrite</div>
+                    <div class="arrow">→</div>
+                    <div class="box box-accent4">Optimizer</div>
+                    <div class="arrow">→</div>
+                    <div class="box box-accent5">Execution Plan</div>
+                    <div class="arrow">→</div>
+                    <div class="box box-accent7">Result</div>
+                </div>
+                <div class="grid-2">
+                    <div class="card fade-in"><div class="card-title">Selection Pushdown</div><p>Apply SELECT early to reduce rows. Push σ before join.</p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">Join Strategies</div><p>Nested Loop · Index Nested Loop · Hash Join · Merge Join</p></div>
+                </div>
+            </div>
+
+            <!-- 2.8 -->
+            <div class="sub-section" id="m2-8">
+                <h3>2.8 MySQL vs Oracle — Case Study</h3>
+                <div class="table-wrap">
+                    <table>
+                        <tr><th>Feature</th><th>MySQL</th><th>Oracle</th></tr>
+                        <tr><td>Cost</td><td class="success">Free</td><td class="danger">Very expensive</td></tr>
+                        <tr><td>Best for</td><td>Web apps, small/medium</td><td>Enterprise, large-scale</td></tr>
+                        <tr><td>Ease of use</td><td>Easy</td><td>Complex</td></tr>
+                        <tr><td>Features</td><td>Good</td><td>Advanced</td></tr>
+                        <tr><td>Performance</td><td>Good</td><td>Excellent</td></tr>
+                        <tr><td>Security</td><td>Basic</td><td>Advanced</td></tr>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <!-- ============================================ -->
+        <!-- MODULE 3 -->
+        <!-- ============================================ -->
+        <section class="section" id="m3-1">
+            <div class="section-header">
+                <span class="module-tag module-m3">Module 3</span>
+                <h2>Indexing, Transactions, Concurrency, Recovery</h2>
+                <p>B-Trees · Hashing · ACID · 2PL · WAL · ARIES</p>
+            </div>
+
+            <!-- 3.1 -->
+            <div class="sub-section" id="m3-1a">
+                <h3>3.1 Indexing — Finding Data Fast</h3>
+                <p>Like an index at the back of a textbook. Without index: check every book → O(n). With index: go straight to shelf → O(log n).</p>
+                <div class="grid-2">
+                    <div class="card fade-in"><div class="card-title">📊 Ordered (B-Tree/B+ Tree)</div><p>Keys sorted. Good for equality, range, sorting.</p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">#️⃣ Hash Index</div><p>Keys mapped to buckets. Good for equality only.</p></div>
+                </div>
+                <div class="grid-2">
+                    <div class="card fade-in"><div class="card-title">Dense vs Sparse</div><p><strong>Dense:</strong> One entry per record. <strong>Sparse:</strong> One entry per block.</p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">Primary vs Secondary</div><p><strong>Primary (Clustering):</strong> Data physically sorted as index. <strong>Secondary (Non-clustering):</strong> Data NOT sorted, points to records.</p></div>
+                </div>
+            </div>
+
+            <!-- 3.2 -->
+            <div class="sub-section" id="m3-2">
+                <h3>3.2 B-Trees and B+ Trees</h3>
+                <p>Shallow tree → few disk reads. Self-balancing → O(log n). Sorted order → range queries.</p>
+                <div class="diagram">
+                    <span class="box box-accent1">[50, 100, 150]</span>
+                    <span class="arrow">→</span>
+                    <span class="box box-accent2">[10,20,30]</span>
+                    <span class="box box-accent2">[60,70,80]</span>
+                    <span class="box box-accent2">[110,120]</span>
+                    <span class="box box-accent2">[160,170,180,190]</span>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <tr><th>Feature</th><th>B-Tree</th><th>B+ Tree</th></tr>
+                        <tr><td>Data location</td><td>All nodes</td><td>Only leaves</td></tr>
+                        <tr><td>Key duplication</td><td>No</td><td>Yes in internal nodes</td></tr>
+                        <tr><td>Leaf linking</td><td>No</td><td>Linked list</td></tr>
+                        <tr><td>Range queries</td><td>Slow</td><td class="success">Fast</td></tr>
+                        <tr><td>Fan-out</td><td>Lower</td><td>Higher</td></tr>
+                        <tr><td>Used by</td><td>File systems</td><td>Most RDBMS</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3.3 -->
+            <div class="sub-section" id="m3-3">
+                <h3>3.3 Hashing — Direct Access</h3>
+                <p><code>h(key) = key mod B</code>. Key 42 → bucket 2. Key 55 → bucket 5. Key 72 → bucket 2 (collision).</p>
+                <div class="grid-2">
+                    <div class="card fade-in"><div class="card-title">Static Hashing</div><p>Fixed number of buckets. Overflow chaining. Problem: as table grows, overflow chains get longer.</p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">Extendible Hashing</div><p>Uses a directory that can grow. Global depth vs local depth.</p></div>
+                </div>
+            </div>
+
+            <!-- 3.4 -->
+            <div class="sub-section" id="m3-4">
+                <h3>3.4 Transactions — The ACID Guarantee</h3>
+                <div class="diagram">
+                    <div class="box box-accent1">A — Atomicity<br><small>All or nothing</small></div>
+                    <div class="box box-accent2">C — Consistency<br><small>Always valid</small></div>
+                    <div class="box box-accent3">I — Isolation<br><small>Like it's the only one</small></div>
+                    <div class="box box-accent4">D — Durability<br><small>Permanent after commit</small></div>
+                </div>
+                <div class="diagram">
+                    <span class="box box-accent5">ACTIVE</span>
+                    <span class="arrow">→</span>
+                    <span class="box box-accent5">PARTIALLY COMMITTED</span>
+                    <span class="arrow">→</span>
+                    <span class="box box-accent5">COMMITTED</span>
+                    <span class="arrow">↘</span>
+                    <span class="box box-accent6">FAILED</span>
+                    <span class="arrow">→</span>
+                    <span class="box box-accent6">ABORTED</span>
+                </div>
+            </div>
+
+            <!-- 3.5 -->
+            <div class="sub-section" id="m3-5">
+                <h3>3.5 Concurrency Control — Handling Multiple Users</h3>
+                <div class="grid-3">
+                    <div class="card fade-in"><div class="card-title">⚠️ Lost Update</div><p>T1 and T2 read same value; T1's update overwritten by T2.</p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">⚠️ Dirty Read</div><p>Reading uncommitted data from another transaction.</p></div>
+                    <div class="card fade-in fade-in-2"><div class="card-title">⚠️ Non-Repeatable Read</div><p>Same query returns different values in same transaction.</p></div>
+                </div>
+                <h4>Locking</h4>
+                <p><strong>Shared Lock (S):</strong> for reading. <strong>Exclusive Lock (X):</strong> for writing.</p>
+                <div class="table-wrap">
+                    <table>
+                        <tr><th></th><th>S</th><th>X</th></tr>
+                        <tr><td><strong>S</strong></td><td class="success">✅</td><td class="danger">❌</td></tr>
+                        <tr><td><strong>X</strong></td><td class="danger">❌</td><td class="danger">❌</td></tr>
+                    </table>
+                </div>
+                <h4>Two-Phase Locking (2PL)</h4>
+                <p>Phase 1: Growing — only acquire locks. Phase 2: Shrinking — only release locks. Ensures serializable schedules.</p>
+                <h4>Isolation Levels</h4>
+                <div class="table-wrap">
+                    <table>
+                        <tr><th>Level</th><th>Dirty Read</th><th>Non-Repeatable</th><th>Phantom</th></tr>
+                        <tr><td>READ UNCOMMITTED</td><td class="danger">Possible</td><td class="danger">Possible</td><td class="danger">Possible</td></tr>
+                        <tr><td>READ COMMITTED</td><td class="success">Not possible</td><td class="danger">Possible</td><td class="danger">Possible</td></tr>
+                        <tr><td>REPEATABLE READ</td><td class="success">Not possible</td><td class="success">Not possible</td><td class="danger">Possible</td></tr>
+                        <tr><td>SERIALIZABLE</td><td class="success">Not possible</td><td class="success">Not possible</td><td class="success">Not possible</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3.6 -->
+            <div class="sub-section" id="m3-6">
+                <h3>3.6 Recovery — Surviving Crashes</h3>
+                <div class="grid-2">
+                    <div class="card fade-in"><div class="card-title">📝 Write-Ahead Logging (WAL)</div><p>Log written BEFORE data page modified. COMMIT record must be in log before transaction considered committed.</p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">⚡ Checkpointing</div><p>Periodically save database state. Recovery starts from checkpoint, not beginning.</p></div>
+                </div>
+                <h4>ARIES Recovery Algorithm</h4>
+                <div class="diagram">
+                    <div class="box box-accent1">1. Analysis<br><small>Dirty pages & active txns</small></div>
+                    <div class="arrow">→</div>
+                    <div class="box box-accent2">2. Redo<br><small>Apply all changes</small></div>
+                    <div class="arrow">→</div>
+                    <div class="box box-accent3">3. Undo<br><small>Roll back uncommitted</small></div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <!-- ============================================ -->
+        <!-- MODULE 4 -->
+        <!-- ============================================ -->
+        <section class="section" id="m4-1">
+            <div class="section-header">
+                <span class="module-tag module-m4">Module 4</span>
+                <h2>Database Security</h2>
+                <p>CIA Triad · Authentication · Authorization · Encryption · Real breaches</p>
+            </div>
+
+            <!-- 4.1 -->
+            <div class="sub-section" id="m4-1a">
+                <h3>4.1 Why Database Security Matters</h3>
+                <div class="diagram">
+                    <div class="box box-accent1">🔒 Confidentiality<br><small>Who can see it?</small><br><small>Encryption, access controls</small></div>
+                    <div class="box box-accent2">✅ Integrity<br><small>Is it correct?</small><br><small>Checksums, audit logs</small></div>
+                    <div class="box box-accent3">🔓 Availability<br><small>Can I use it?</small><br><small>Backups, failover, RAID</small></div>
+                </div>
+                <h4>Common Threats</h4>
+                <div class="table-wrap">
+                    <table>
+                        <tr><th>Threat</th><th>Description</th><th>Example</th></tr>
+                        <tr><td>SQL Injection</td><td>Malicious SQL in user input</td><td><code>' OR '1'='1</code></td></tr>
+                        <tr><td>Unauthorized Access</td><td>Stolen passwords</td><td>admin/password</td></tr>
+                        <tr><td>Data Tampering</td><td>Changing data</td><td>Altering grades</td></tr>
+                        <tr><td>Denial of Service</td><td>Overwhelming system</td><td>Flooding requests</td></tr>
+                        <tr><td>Privilege Escalation</td><td>Getting more power</td><td>Regular user → admin</td></tr>
+                    </table>
+                </div>
+                <h4>Defense in Depth</h4>
+                <div class="diagram">
+                    <div class="box box-accent1">Physical</div>
+                    <div class="arrow">→</div>
+                    <div class="box box-accent2">Network</div>
+                    <div class="arrow">→</div>
+                    <div class="box box-accent3">OS</div>
+                    <div class="arrow">→</div>
+                    <div class="box box-accent4">DBMS</div>
+                    <div class="arrow">→</div>
+                    <div class="box box-accent5">Application</div>
+                </div>
+            </div>
+
+            <!-- 4.2 -->
+            <div class="sub-section" id="m4-2">
+                <h3>4.2 Authentication — Who Are You?</h3>
+                <div class="grid-3">
+                    <div class="card fade-in"><div class="card-title">🔑 Knowledge</div><p>Something you know — password, PIN</p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">📱 Possession</div><p>Something you have — phone OTP, smart card</p></div>
+                    <div class="card fade-in fade-in-2"><div class="card-title">👁️ Inherence</div><p>Something you are — fingerprint, face</p></div>
+                </div>
+                <div class="callout callout-success"><strong>MFA =</strong> At least 2 different factors!</div>
+            </div>
+
+            <!-- 4.3 -->
+            <div class="sub-section" id="m4-3">
+                <h3>4.3 Authorization — What Can You Do?</h3>
+                <div class="grid-2">
+                    <div class="card fade-in"><div class="card-title">Object Privileges</div><p>SELECT · INSERT · UPDATE · DELETE · REFERENCES · EXECUTE · ALL PRIVILEGES</p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">System Privileges</div><p>CREATE USER · CREATE TABLE · DROP ANY TABLE · BACKUP ANY TABLE</p></div>
+                </div>
+                <div class="card fade-in">
+                    <div class="card-title">Principle of Least Privilege</div>
+                    <p>Give users only the minimum privileges they need. ❌ Clerk ALL PRIVILEGES → ✅ Clerk SELECT only.</p>
+                </div>
+            </div>
+
+            <!-- 4.4 -->
+            <div class="sub-section" id="m4-4">
+                <h3>4.4 Access Control Models</h3>
+                <div class="grid-3">
+                    <div class="card fade-in"><div class="card-title">DAC</div><p><strong>Discretionary:</strong> Owner decides access. GRANT/REVOKE. Flexible, intuitive.</p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">MAC</div><p><strong>Mandatory:</strong> Central authority assigns labels. Bell-LaPadula: No Read Up, No Write Down.</p></div>
+                    <div class="card fade-in fade-in-2"><div class="card-title">RBAC</div><p><strong>Role-Based:</strong> Permissions → Roles → Users. Simplified administration.</p></div>
+                </div>
+                <div class="callout callout-info">
+                    <strong>Bell-LaPadula:</strong> Secret user can read ≤ Secret, write ≥ Secret. Cannot read Top Secret. Cannot write to Confidential.
+                </div>
+            </div>
+
+            <!-- 4.5 -->
+            <div class="sub-section" id="m4-5">
+                <h3>4.5 Encryption — Protecting Data</h3>
+                <div class="grid-2">
+                    <div class="card fade-in"><div class="card-title">🔐 Symmetric (AES)</div><p>Same key for encrypt/decrypt. Fast. Good for bulk data. Problem: key sharing.</p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">🔑 Asymmetric (RSA)</div><p>Public key encrypts, private key decrypts. Slower. Used for key exchange & signatures.</p></div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <tr><th>Property</th><th>Symmetric (AES)</th><th>Asymmetric (RSA)</th></tr>
+                        <tr><td>Keys</td><td>One shared</td><td>Public + Private</td></tr>
+                        <tr><td>Speed</td><td>Very fast</td><td>Slow</td></tr>
+                        <tr><td>Key distribution</td><td>Hard</td><td>Easy</td></tr>
+                        <tr><td>Use case</td><td>Bulk data</td><td>Key exchange, signatures</td></tr>
+                    </table>
+                </div>
+                <h4>TDE — Transparent Data Encryption</h4>
+                <p>DBMS auto-encrypts files on disk. Application sees plaintext. Protects backups & stolen drives.</p>
+                <h4>Encryption vs Hashing</h4>
+                <div class="table-wrap">
+                    <table>
+                        <tr><th>Property</th><th>Encryption</th><th>Hashing</th></tr>
+                        <tr><td>Reversible?</td><td>Yes (with key)</td><td>No (one-way)</td></tr>
+                        <tr><td>Purpose</td><td>Confidentiality</td><td>Integrity, password storage</td></tr>
+                        <tr><td>Output</td><td>Same length as input</td><td>Fixed length</td></tr>
+                        <tr><td>Example</td><td>AES, RSA</td><td>SHA-256, bcrypt</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 4.6 -->
+            <div class="sub-section" id="m4-6">
+                <h3>4.6 Lessons from Real Breaches</h3>
+                <div class="grid-2">
+                    <div class="card fade-in"><div class="card-title">🎮 Sony PSN (2011)</div><p>77M accounts. SQL injection, weak MD5 passwords. <strong>Lesson:</strong> parameterized queries, strong hashing.</p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">🏦 Equifax (2017)</div><p>148M people. Unpatched Apache Struts. <strong>Lesson:</strong> patch management.</p></div>
+                    <div class="card fade-in fade-in-2"><div class="card-title">📊 Cambridge Analytica (2018)</div><p>87M profiles. Abuse of authorized API access. <strong>Lesson:</strong> least privilege, audit third-party access.</p></div>
+                    <div class="card fade-in fade-in-3"><div class="card-title">🏨 Marriott (2018)</div><p>500M guest records. Undetected compromise since 2014. <strong>Lesson:</strong> M&A security due diligence, MFA.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <!-- ============================================ -->
+        <!-- MODULE 5 -->
+        <!-- ============================================ -->
+        <section class="section" id="m5-1">
+            <div class="section-header">
+                <span class="module-tag module-m5">Module 5</span>
+                <h2>Data Warehousing, Data Mining & Security</h2>
+                <p>OLAP · Star Schema · ETL · KDD · Mining Techniques · DW Security</p>
+            </div>
+
+            <!-- 5.1 -->
+            <div class="sub-section" id="m5-1a">
+                <h3>5.1 Data Warehousing — The Analytics Database</h3>
+                <div class="table-wrap">
+                    <table>
+                        <tr><th>OLTP (Operational)</th><th>OLAP (Analytical)</th></tr>
+                        <tr><td>Run the business</td><td>Understand the business</td></tr>
+                        <tr><td>Many small transactions</td><td>Few complex queries</td></tr>
+                        <tr><td>INSERT, UPDATE, DELETE</td><td>SELECT with aggregations</td></tr>
+                        <tr><td>Current data only</td><td>Historical data</td></tr>
+                        <tr><td>Normalized (3NF)</td><td>Denormalized (Star/Snowflake)</td></tr>
+                        <tr><td>Sub-second response</td><td>Seconds to minutes</td></tr>
+                    </table>
+                </div>
+                <h4>Star Schema</h4>
+                <div class="diagram">
+                    <span class="box box-accent1">Date_Dim</span>
+                    <span class="arrow">↓</span>
+                    <span class="box box-accent4">⭐ Sales_Fact<br><small>Measures: units_sold, revenue, cost</small></span>
+                    <span class="arrow">←</span>
+                    <span class="box box-accent2">Product_Dim</span>
+                    <span class="box box-accent3">Customer_Dim</span>
+                    <span class="box box-accent5">Store_Dim</span>
+                </div>
+                <h4>ETL — Extract, Transform, Load</h4>
+                <div class="diagram">
+                    <div class="box box-accent1">Extract<br><small>Read from sources</small></div>
+                    <div class="arrow">→</div>
+                    <div class="box box-accent2">Transform<br><small>Clean, standardize, validate</small></div>
+                    <div class="arrow">→</div>
+                    <div class="box box-accent3">Load<br><small>Insert into warehouse</small></div>
+                </div>
+                <h4>Star vs Snowflake</h4>
+                <div class="table-wrap">
+                    <table>
+                        <tr><th>Aspect</th><th>Star</th><th>Snowflake</th></tr>
+                        <tr><td>Normalization</td><td>Denormalized</td><td>Normalized</td></tr>
+                        <tr><td>Query speed</td><td class="success">Faster</td><td>Slower</td></tr>
+                        <tr><td>Storage</td><td>More</td><td>Less</td></tr>
+                        <tr><td>Complexity</td><td>Simple</td><td>Complex</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5.2 -->
+            <div class="sub-section" id="m5-2">
+                <h3>5.2 Data Mining — Finding Patterns</h3>
+                <div class="diagram">
+                    <div class="box box-accent1">Selection</div>
+                    <div class="arrow">→</div>
+                    <div class="box box-accent2">Preprocessing</div>
+                    <div class="arrow">→</div>
+                    <div class="box box-accent3">Transformation</div>
+                    <div class="arrow">→</div>
+                    <div class="box box-accent4">Data Mining</div>
+                    <div class="arrow">→</div>
+                    <div class="box box-accent5">Interpretation</div>
+                </div>
+                <div class="grid-5">
+                    <div class="card fade-in" style="text-align:center;"><div class="card-title">🏷️ Classification</div><p style="font-size:11px;">Supervised · Labels</p></div>
+                    <div class="card fade-in fade-in-1" style="text-align:center;"><div class="card-title">🔵 Clustering</div><p style="font-size:11px;">Unsupervised · Groups</p></div>
+                    <div class="card fade-in fade-in-2" style="text-align:center;"><div class="card-title">🔗 Association</div><p style="font-size:11px;">If X then Y</p></div>
+                    <div class="card fade-in fade-in-3" style="text-align:center;"><div class="card-title">📈 Regression</div><p style="font-size:11px;">Numeric prediction</p></div>
+                    <div class="card fade-in" style="text-align:center;"><div class="card-title">⚠️ Anomaly</div><p style="font-size:11px;">Outliers</p></div>
+                </div>
+                <div class="callout callout-info">
+                    <strong>Association Metrics:</strong> Support = #(X∪Y)/#Transactions · Confidence = #(X∪Y)/#(X) · Lift = Confidence/Support(Y)
+                </div>
+            </div>
+
+            <!-- 5.3 -->
+            <div class="sub-section" id="m5-3">
+                <h3>5.3 Security in Data Warehousing</h3>
+                <div class="grid-2">
+                    <div class="card fade-in"><div class="card-title">🎭 Aggregation Problem</div><p>Users can infer individual data by combining aggregate queries. Example: Average salary in a department of 1 employee.</p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">🕵️ Inference</div><p>Use non-sensitive data to deduce sensitive facts. Prevention: cell suppression, k-anonymity, differential privacy.</p></div>
+                </div>
+                <div class="grid-2">
+                    <div class="card fade-in"><div class="card-title">🎭 Data Masking</div><p>Replace sensitive data with realistic but fake data. Static, Dynamic, On-the-fly.</p></div>
+                    <div class="card fade-in fade-in-1"><div class="card-title">📋 Auditing</div><p>Track who did what, when, where. Essential for compliance and incident response.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <!-- ============================================ -->
+        <!-- TUTORIALS -->
+        <!-- ============================================ -->
+        <section class="section" id="t01">
+            <div class="section-header">
+                <span class="module-tag module-tutorial">Tutorials</span>
+                <h2>Hands-on Problems & Solutions</h2>
+                <p>T01 through T15 — covering all modules with detailed explanations</p>
+            </div>
+
+            <div class="sub-section" id="t01a">
+                <h3>T01: Introduction to DBMS</h3>
+                <div class="card fade-in"><div class="card-subtitle">Problem 1</div><p>File System vs DBMS scenarios — Personal grocery list → File system; Bank transactions → DBMS (ACID, concurrency, recovery).</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 2</div><p>Identify redundancy: InstructorPhone stored in both files. Instructor name appears as "CourseInstructor" and "InstructorName".</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 3</div><p>DBMS components: Query Processor, Storage Manager, Transaction Manager, Lock Manager, Recovery Manager, Buffer Manager.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 4</div><p>Three schema architecture: External (View), Conceptual, Internal levels.</p></div>
+            </div>
+
+            <div class="sub-section" id="t02">
+                <h3>T02: Data Abstraction & SQL</h3>
+                <div class="card fade-in"><div class="card-subtitle">Problem 1</div><p>Adding new column → Logical independence. Creating index → Physical independence. Splitting table → Logical. Changing file org → Physical.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 2</div><p>DDL vs DML: CREATE, ALTER, DROP, TRUNCATE = DDL. SELECT, INSERT, UPDATE, DELETE = DML.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 3</div><p>Views: StudentGrades (join Student + Enrollment). FacultyView (aggregate with COUNT, AVG).</p></div>
+            </div>
+
+            <div class="sub-section" id="t03">
+                <h3>T03: Data Models & Integrity Constraints</h3>
+                <div class="card fade-in"><div class="card-subtitle">Problem 1</div><p>ER Diagram for Library: Book, Member, Loan, Librarian. M:N relationship with LoanDate, DueDate attributes.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 2</div><p>Integrity constraints: PK not null, CHECK age range, Gender IN ('M','F','O'), FK to Department.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 3</div><p>Hierarchical (Tree, 1:N) vs Network (Graph, M:N) vs Relational (Tables, via FKs).</p></div>
+            </div>
+
+            <div class="sub-section" id="t04">
+                <h3>T04: Relational Algebra Basics</h3>
+                <div class="card fade-in"><div class="card-subtitle">Problem 1</div><p>Select operations: σ(Dept='CS'), σ(GPA>=8), σ(Dept='CS' AND GPA>=8), σ(Dept<>'CS' AND Dept<>'EE').</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 2</div><p>Project: π(Dept), π(Name, GPA).</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 3</div><p>Combine: π(Name,GPA)(σ(Dept='CS')(Student)).</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 4</div><p>Rename: ρ(E1), ρ(E2) for self-join pairs.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 5</div><p>Complex conditions: σ(HireYear>2020 AND Salary>50000 AND (DeptID='D1' OR DeptID='D2')).</p></div>
+            </div>
+
+            <div class="sub-section" id="t05">
+                <h3>T05: Relational Algebra Advanced</h3>
+                <div class="card fade-in"><div class="card-subtitle">Problem 1</div><p>Set operations: Union (either year), Intersection (both years), Difference (2025 only).</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 2</div><p>Cartesian Product vs Join: × pairs everything; ⋈ only meaningful rows.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 3</div><p>Division: EnrolledStudent / CSCourses = students in ALL CS courses.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 4</div><p>TRC: {t.Name | Student(t) ∧ ∃e (Enrollment(e) ∧ e.RollNo=t.RollNo ∧ e.CourseCode='CS301')}</p></div>
+            </div>
+
+            <div class="sub-section" id="t06">
+                <h3>T06: SQL Basics</h3>
+                <div class="card fade-in"><div class="card-subtitle">Problem 1</div><p>CREATE DATABASE, tables with PK, FK, CHECK constraints.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 2</div><p>INSERT sample data into Student, Course, Enrollment tables.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 3</div><p>SELECT queries: WHERE Dept='CS', GPA>=8, ORDER BY GPA DESC LIMIT 3.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 4</div><p>UPDATE with GPA bonus (capped at 10). DELETE with cascading.</p></div>
+            </div>
+
+            <div class="sub-section" id="t07">
+                <h3>T07: SQL Advanced</h3>
+                <div class="card fade-in"><div class="card-subtitle">Problem 1</div><p>JOIN operations: INNER JOIN (students with enrollments), LEFT JOIN (all students).</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 2</div><p>Subqueries: WHERE RollNo IN (SELECT...), GPA > (SELECT AVG(GPA)).</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 3</div><p>Aggregation: COUNT per dept, AVG(GPA) > 8.0 with HAVING.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 4</div><p>Top student per department: correlated subquery with MAX(GPA).</p></div>
+            </div>
+
+            <div class="sub-section" id="t08">
+                <h3>T08: Normalization</h3>
+                <div class="card fade-in"><div class="card-subtitle">Problem 1</div><p>1NF: Split multi-value Courses into separate rows.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 2</div><p>2NF: Student(RollNo, Name), Course(CourseCode, Instructor), Enrollment(RollNo, CourseCode, Grade).</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 3</div><p>3NF: Employee(EID, Name, DeptID), Department(DeptID, DeptLocation, Manager).</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 4</div><p>BCNF: SubjectProfessor(Professor, SubjectCode), Enrollment(RollNo, Professor, Grade).</p></div>
+            </div>
+
+            <div class="sub-section" id="t09">
+                <h3>T09: Indexing</h3>
+                <div class="card fade-in"><div class="card-subtitle">Problem 1</div><p>B+ Tree search: keys 10-90, order 4. Search 45 → not found.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 2</div><p>Insert 25 → leaf [10,20,30] becomes [10,20,25,30].</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 3</div><p>Static hashing: h(k)=k mod 5. Buckets: 0→[25,30], 1→[], 2→[12,37,27], 3→[18], 4→[42].</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 4</div><p>B-Tree vs B+ Tree: data pointers location, leaf linking, range query speed.</p></div>
+            </div>
+
+            <div class="sub-section" id="t10">
+                <h3>T10: Transactions & Serializability</h3>
+                <div class="card fade-in"><div class="card-subtitle">Problem 1</div><p>ACID example: Transfer $100 — atomicity (both or none), consistency (sum preserved), isolation (no intermediate states), durability (persists).</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 2</div><p>Conflict serializable: T1→T2, no cycle.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 3</div><p>Deadlock: T1 holds X(A) requests X(B); T2 holds X(B) requests X(A). Cycle → victim aborted.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 4</div><p>Recoverable vs Cascadeless schedules.</p></div>
+            </div>
+
+            <div class="sub-section" id="t11">
+                <h3>T11: Locking & Timestamp Protocols</h3>
+                <div class="card fade-in"><div class="card-subtitle">Problem 1</div><p>Lock compatibility: S-S compatible, X-X incompatible.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 2</div><p>2PL example: growing phase (acquire LOCK-S, LOCK-X), shrinking phase (UNLOCK).</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 3</div><p>Timestamp ordering: T1(TS=100) reads, T2(TS=200) writes — both OK.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 4</div><p>Thomas' Write Rule: ignore obsolete write instead of aborting.</p></div>
+            </div>
+
+            <div class="sub-section" id="t12">
+                <h3>T12: Recovery</h3>
+                <div class="card fade-in"><div class="card-subtitle">Problem 1</div><p>WAL: Log before data. UNDO if not committed.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 2</div><p>Log-based recovery: T1, T2 committed before checkpoint → no action. T3 active → UNDO.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 3</div><p>ARIES: Analysis, Redo, Undo phases.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 4</div><p>Deferred vs Immediate update — when DB write occurs, UNDO/REDO needed.</p></div>
+            </div>
+
+            <div class="sub-section" id="t13">
+                <h3>T13: Security Basics</h3>
+                <div class="card fade-in"><div class="card-subtitle">Problem 1</div><p>CIA violations: reading salary → Confidentiality; modifying balance → Integrity; server crash → Availability.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 2</div><p>SQL injection: <code>' OR '1'='1</code> comments out password check. Fix: parameterized queries.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 3</div><p>Authentication methods: Password (low), 2FA (high), Biometric (high), Certificate (very high).</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 4</div><p>GRANT/REVOKE SQL commands.</p></div>
+            </div>
+
+            <div class="sub-section" id="t14">
+                <h3>T14: Authorization & Encryption</h3>
+                <div class="card fade-in"><div class="card-subtitle">Problem 1</div><p>Symmetric vs Asymmetric: keys, speed, algorithms, use cases.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 2</div><p>Encryption at rest: TDE (auto-encrypts files), Column-level (encrypt specific columns).</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 3</div><p>Row-Level Security with CREATE POLICY.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 4</div><p>Auditing with CREATE SERVER AUDIT.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 5</div><p>View-based security to hide sensitive columns.</p></div>
+            </div>
+
+            <div class="sub-section" id="t15">
+                <h3>T15: Data Warehousing & Mining</h3>
+                <div class="card fade-in"><div class="card-subtitle">Problem 1</div><p>Star schema design: Sales_Fact + Date_Dim, Product_Dim, Customer_Dim, Store_Dim.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 2</div><p>OLAP operations: Slice (fix dimension), Dice (sub-cube), Roll-up (aggregate), Drill-down (disaggregate).</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 3</div><p>Association rules: Support(Bread)=80%, Confidence(Bread→Milk)=75%.</p></div>
+                <div class="card fade-in"><div class="card-subtitle">Problem 4</div><p>Snowflake vs Star: normalization, query speed, storage, complexity.</p></div>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <!-- ============================================ -->
+        <!-- SQL COMMAND SUMMARY -->
+        <!-- ============================================ -->
+        <section class="section" id="sql-commands">
+            <div class="section-header">
+                <span class="module-tag module-tutorial">Reference</span>
+                <h2>Summary of Key SQL Commands</h2>
+                <p>DDL · DML · DCL · TCL — everything you need to query and manage databases</p>
+            </div>
+
+            <div class="grid-4">
+                <div class="card fade-in">
+                    <div class="card-title">🏗️ DDL</div>
+                    <ul style="list-style:none;padding:0;">
+                        <li><code style="color:var(--accent1);">CREATE</code> — Create objects</li>
+                        <li><code style="color:var(--accent1);">ALTER</code> — Modify objects</li>
+                        <li><code style="color:var(--accent1);">DROP</code> — Delete objects</li>
+                        <li><code style="color:var(--accent1);">TRUNCATE</code> — Empty table</li>
+                    </ul>
+                </div>
+                <div class="card fade-in fade-in-1">
+                    <div class="card-title">📝 DML</div>
+                    <ul style="list-style:none;padding:0;">
+                        <li><code style="color:var(--accent2);">INSERT</code> — Add rows</li>
+                        <li><code style="color:var(--accent2);">SELECT</code> — Read data</li>
+                        <li><code style="color:var(--accent2);">UPDATE</code> — Modify rows</li>
+                        <li><code style="color:var(--accent2);">DELETE</code> — Remove rows</li>
+                    </ul>
+                </div>
+                <div class="card fade-in fade-in-2">
+                    <div class="card-title">🔐 DCL</div>
+                    <ul style="list-style:none;padding:0;">
+                        <li><code style="color:var(--accent3);">GRANT</code> — Give privileges</li>
+                        <li><code style="color:var(--accent3);">REVOKE</code> — Remove privileges</li>
+                    </ul>
+                </div>
+                <div class="card fade-in fade-in-3">
+                    <div class="card-title">🔄 TCL</div>
+                    <ul style="list-style:none;padding:0;">
+                        <li><code style="color:var(--accent4);">COMMIT</code> — Make permanent</li>
+                        <li><code style="color:var(--accent4);">ROLLBACK</code> — Undo changes</li>
+                        <li><code style="color:var(--accent4);">SAVEPOINT</code> — Recovery point</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <!-- ============================================ -->
+        <!-- PRACTICE QUESTIONS -->
+        <!-- ============================================ -->
+        <section class="section" id="practice">
+            <div class="section-header">
+                <span class="module-tag module-tutorial">Practice</span>
+                <h2>Final Practice Questions</h2>
+                <p>Test your knowledge with these comprehensive questions and answers</p>
+            </div>
+
+            <div class="card fade-in">
+                <div class="card-title">Question 1 — Library Database</div>
+                <p>Design a database for a library with tables: Book, Member, Borrow. Include all integrity constraints.</p>
+                <div class="code-block"><span class="kw">CREATE TABLE</span> Book (
+                    ISBN <span class="kw">VARCHAR</span>(<span class="num">13</span>) <span class="kw">PRIMARY KEY</span>,
+                    Title <span class="kw">VARCHAR</span>(<span class="num">200</span>) <span class="kw">NOT NULL</span>,
+                    Author <span class="kw">VARCHAR</span>(<span class="num">100</span>),
+                    <span class="kw">Year</span> <span class="kw">INT</span> <span class="kw">CHECK</span> (<span class="kw">Year</span> >= <span class="num">1900</span>),
+                    Copies <span class="kw">INT</span> <span class="kw">DEFAULT</span> <span class="num">1</span>
+                    );</div>
+            </div>
+
+            <div class="card fade-in">
+                <div class="card-title">Question 2 — Students in ALL CS Courses</div>
+                <div class="code-block"><span class="kw">SELECT</span> s.Name
+                <span class="kw">FROM</span> Student s
+                <span class="kw">WHERE</span> <span class="kw">NOT EXISTS</span> (
+                <span class="kw">SELECT</span> c.CourseCode <span class="kw">FROM</span> Course c
+                <span class="kw">WHERE</span> c.Dept = <span class="str">'CS'</span>
+                <span class="kw">EXCEPT</span>
+                <span class="kw">SELECT</span> e.CourseCode <span class="kw">FROM</span> Enrollment e
+                <span class="kw">WHERE</span> e.RollNo = s.RollNo
+                );</div>
+            </div>
+
+            <div class="card fade-in">
+                <div class="card-title">Question 3 — 3NF vs BCNF</div>
+                <p><strong>3NF:</strong> No transitive dependency. <strong>BCNF:</strong> Every determinant must be a candidate key. Example: R(A,B,C) with FDs {AB→C, C→B} satisfies 3NF but violates BCNF.</p>
+            </div>
+
+            <div class="card fade-in">
+                <div class="card-title">Question 4 — Shared vs Exclusive Locks</div>
+                <p><strong>Shared (S):</strong> For reading, multiple transactions can hold simultaneously. <strong>Exclusive (X):</strong> For writing, only one transaction can hold.</p>
+            </div>
+
+            <div class="card fade-in">
+                <div class="card-title">Question 5 — Star Schema for Sales</div>
+                <p><strong>Fact:</strong> Sales_Fact(SaleID, DateKey, ProductKey, CustomerKey, StoreKey, Quantity, Amount). <strong>Dimensions:</strong> Date, Product, Customer, Store.</p>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <!-- ============================================ -->
+        <!-- FINAL WORD -->
+        <!-- ============================================ -->
+        <section class="section" id="final-word" style="text-align:center;padding-bottom:100px;">
+            <div class="section-header">
+                <span class="module-tag module-m5">🎓 Graduation</span>
+                <h2>Final Word</h2>
+                <p>You have covered the entire DBMS syllabus</p>
+            </div>
+            <div class="card fade-in" style="max-width:600px;margin:0 auto;">
+                <div class="card-title"><span class="emoji">📦</span> Complete Syllabus</div>
+                <ul style="text-align:left;">
+                    <li><strong>Module 1:</strong> Foundations — DBMS, abstraction, data models, constraints</li>
+                    <li><strong>Module 2:</strong> Querying & Design — Algebra, calculus, SQL, normalization</li>
+                    <li><strong>Module 3:</strong> Internals — Indexing, B+ trees, hashing, transactions, recovery</li>
+                    <li><strong>Module 4:</strong> Security — Authentication, authorization, encryption</li>
+                    <li><strong>Module 5:</strong> Analytics — Data warehousing, data mining, DW security</li>
+                    <li><strong>Tutorials:</strong> All concepts applied through hands-on problems</li>
+                </ul>
+                <div class="callout callout-success" style="margin-top:16px;">
+                    <strong>You have transformed from a child to a professor.</strong><br>
+                    You understand how databases work internally, how to design them properly, how to protect them, and how to extract value from them.
+                </div>
+                <p style="margin-top:16px;color:var(--accent4);font-style:italic;">"Data is the new oil. Data warehousing is the refinery. Data mining is the analytics. And security is the safe that protects it all."</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p>© 2026 DBMS Guide · <span class="dev-credit">Develop by Ramdas Hembram</span></p>
+    </footer>
+
+    <script>
+        // Progress bar
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollTop / docHeight) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+        });
+
+        // Sidebar toggle for mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('open');
+            if (sidebar.classList.contains('open')) {
+                overlay.style.display = 'block';
+            } else {
+                overlay.style.display = 'none';
+            }
+        }
+
+        // Search filter for navigation
+        function filterNav(query) {
+            const links = document.querySelectorAll('#nav-list li a');
+            const groupTitles = document.querySelectorAll('.nav-group-title');
+            query = query.toLowerCase();
+            links.forEach(link => {
+                const text = link.textContent.toLowerCase();
+                if (text.includes(query) || query === '') {
+                    link.style.display = '';
+                } else {
+                    link.style.display = 'none';
+                }
+            });
+            groupTitles.forEach(title => {
+                title.style.display = query === '' ? '' : 'none';
+            });
+            // If query is empty, show all
+            if (query === '') {
+                links.forEach(link => link.style.display = '');
+                groupTitles.forEach(title => title.style.display = '');
+            }
+        }
+
+        // Active link highlighting on scroll
+        const sections = document.querySelectorAll('section[id], .sub-section[id]');
+        const navLinks = document.querySelectorAll('.nav-list li a');
+
+        window.addEventListener('scroll', function() {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                const href = link.getAttribute('href').substring(1);
+                if (href === current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Smooth scroll for nav links (enhance native behavior)
+        document.querySelectorAll('.nav-list li a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768) {
+                    // Close sidebar on mobile
+                    const sidebar = document.getElementById('sidebar');
+                    const overlay = document.getElementById('sidebar-overlay');
+                    sidebar.classList.remove('open');
+                    overlay.style.display = 'none';
+                }
+            });
+        });
+
+        // Intersection Observer for fade-in animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            el.style.animationPlayState = 'paused';
+            observer.observe(el);
+        });
+
+        // Initialize: play animations for elements already in view
+        document.querySelectorAll('.fade-in').forEach(el => {
+            const rect = el.getBoundingClientRect();
+            if (rect.top < window.innerHeight) {
+                el.style.animationPlayState = 'running';
+            }
+        });
+    </script>
+</body>
+</html>
